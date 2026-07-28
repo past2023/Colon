@@ -105,7 +105,7 @@ canvas {
   font-weight: 700;
   letter-spacing: 0.01em;
 }
-.panel p { font-size: clamp(13px, 2.4vmin, 18px); line-height: 1.7; }
+.panel p { font-size: clamp(14px, 2.7vmin, 20px); line-height: 1.65; }
 .panel b { color: var(--gold); }
 
 .parchment {
@@ -118,32 +118,32 @@ canvas {
 .parchment h3 { color: #6b4a1f; }
 
 .modal {
-  max-width: min(90%, 660px);
-  max-height: 90%;
+  max-width: min(92%, 720px);
+  max-height: 92%;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   align-items: center;
-  padding: 22px 30px;
+  padding: 24px 32px;
 }
-.modal h3 { font-size: clamp(14px, 2.6vmin, 20px); color: var(--gold); text-shadow: 2px 2px 0 #000; letter-spacing: 0.04em; }
+.modal h3 { font-size: clamp(15px, 2.9vmin, 23px); color: var(--gold); text-shadow: 2px 2px 0 #000; letter-spacing: 0.04em; }
 /* Bloque de frase histórica: grande y compacto */
 .fact-text {
-  font-size: clamp(16px, 3vmin, 24px);
-  line-height: 1.55;
-  max-width: 32em;
+  font-size: clamp(18px, 3.4vmin, 28px);
+  line-height: 1.5;
+  max-width: 34em;
   text-align: center;
 }
 
 .btn {
   font-family: inherit;
-  font-size: clamp(11px, 2.2vmin, 16px);
+  font-size: clamp(13px, 2.5vmin, 19px);
   background: var(--red);
   color: #fff;
   border: 4px solid #0d1126;
   box-shadow: inset -4px -4px 0 #0006, 0 5px 0 #0009;
-  padding: 12px 22px;
+  padding: 13px 26px;
   cursor: pointer;
   text-shadow: 2px 2px 0 #000;
 }
@@ -167,26 +167,26 @@ canvas {
 .intro-sub { font-size: clamp(8px, 1.3vw, 11px); color: var(--parchment); }
 
 /* ---------- Quiz ---------- */
-.quiz-q { font-size: clamp(15px, 2.8vmin, 22px); line-height: 1.55; color: #fff; text-shadow: 1px 2px 0 #000; }
+.quiz-q { font-size: clamp(17px, 3.2vmin, 26px); line-height: 1.5; color: #fff; text-shadow: 1px 2px 0 #000; }
 #quiz-answers { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-#quiz-answers .btn { width: 100%; background: #31406e; font-size: clamp(13px, 2.4vmin, 18px); line-height: 1.5; padding: 14px 16px; }
+#quiz-answers .btn { width: 100%; background: #31406e; font-size: clamp(15px, 2.7vmin, 21px); line-height: 1.45; padding: 15px 18px; }
 #quiz-answers .btn.right { background: #2e8b57; }
 #quiz-answers .btn.wrong { background: #8b2222; animation: shake 0.3s; }
 @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
-.feedback { min-height: 18px; font-size: clamp(13px, 2.4vmin, 18px); color: var(--gold); }
+.feedback { min-height: 20px; font-size: clamp(14px, 2.6vmin, 20px); color: var(--gold); }
 
 /* ---------- Listas de hechos ---------- */
 .facts-list {
   max-height: 32vh;
   overflow-y: auto;
   text-align: left;
-  font-size: clamp(13px, 2.2vmin, 17px);
-  line-height: 1.7;
-  padding: 4px 10px;
+  font-size: clamp(14px, 2.6vmin, 20px);
+  line-height: 1.65;
+  padding: 4px 12px;
 }
 .facts-list p { margin-bottom: 6px; }
 .facts-list p::before { content: "📜 "; }
-.score-line { font-size: clamp(14px, 2.6vmin, 20px); }
+.score-line { font-size: clamp(16px, 3vmin, 24px); }
 
 /* Scanlines sutiles estilo CRT sobre el canvas (no sobre los textos) */
 #game-wrap::after {

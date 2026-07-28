@@ -23,7 +23,8 @@ No requiere instalación ni conexión (la fuente pixel de Google es opcional).
   **hecho real de la vida de Colón**.
 - 👾 Salta sobre los enemigos (ratas del puerto, cortesanos envidiosos y nubes de tormenta).
 - 🚩 Al final de cada nivel, la bandera lanza un **reto de historia** (quiz) para poder continuar.
-- ❤️ Tres corazones por nivel; el agua y los fosos quitan uno.
+- ❤️ Tres corazones por nivel; los fosos esconden **canales de agua animada**
+  (¡con salpicadura y ondas al caer!) — no te bañes.
 - P o ESC abre la **bitácora**: un repaso de todo lo aprendido.
 - 🎵 **Cada nivel tiene su propia canción chiptune** (Génova, la corte y una jiga marinera).
 - 🎓 Al superar los 3 niveles hay un **EXAMEN FINAL** de 5 preguntas: si lo aciertas todo

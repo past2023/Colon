@@ -327,6 +327,28 @@ const SPR_CLOUD_BG = makeSprite([
   "wwwwwwwwwwwwww.."
 ], { w: '#ffffff' });
 
+const WATER_PAL = { B: '#2878c8', b: '#5aa8e8', w: '#bfe6ff', W: '#ffffff' };
+const WATER_TOP_FRAMES = [
+  makeSprite([
+    "..ww....ww....w.",
+    ".wWWw..wWWw..wWw",
+    "bbbbbbbbbbbbbbbb",
+    "BBBBBBBBBBBBBBBB"
+  ], WATER_PAL),
+  makeSprite([
+    "...ww....ww....w",
+    "..wWWw..wWWw..wW",
+    "bbbbbbbbbbbbbbbb",
+    "BBBBBBBBBBBBBBBB"
+  ], WATER_PAL),
+  makeSprite([
+    "w...ww....ww....",
+    "Ww..wWWw..wWWw..",
+    "bbbbbbbbbbbbbbbb",
+    "BBBBBBBBBBBBBBBB"
+  ], WATER_PAL)
+];
+
 const WATER_FRAMES = [
   makeSprite([
     "wwBwwBwwBwwBwwBw",
@@ -532,6 +554,8 @@ const LEVELS = [];
   const L = levelBuilder(140, 18);
   const G = 15; // fila superior del suelo
   L.ground(0, 29, G); L.ground(32, 49, G); L.ground(53, 74, G); L.ground(79, 139, G);
+  // canales de agua animada en los fosos
+  L.water(30, 31, 16); L.water(50, 52, 16); L.water(75, 78, 16);
   L.fill(10, 11, 1, 1, CODES.QCOIN); L.fill(12, 11, 1, 1, CODES.QSCROLL); L.fill(14, 11, 1, 1, CODES.QCOIN);
   L.fill(20, 12, 4, 1, CODES.BRICK); L.fill(21, 12, 1, 1, CODES.QCOIN);
   L.fill(27, 11, 1, 1, CODES.QSCROLL);
@@ -583,6 +607,8 @@ const LEVELS = [];
   const L = levelBuilder(150, 18);
   const G = 15;
   L.ground(0, 34, G); L.ground(38, 69, G); L.ground(74, 109, G); L.ground(113, 149, G);
+  // canales de agua animada en los fosos
+  L.water(35, 37, 16); L.water(70, 73, 16); L.water(110, 112, 16);
   L.fill(8, 11, 1, 1, CODES.QCOIN); L.fill(10, 11, 1, 1, CODES.QSCROLL); L.fill(12, 11, 1, 1, CODES.QCOIN);
   L.fill(18, 12, 4, 1, CODES.BRICK);
   L.fill(24, 11, 1, 1, CODES.QSCROLL);
@@ -761,7 +787,7 @@ const Game = {
   score: 0, coins: 0, scrolls: 0, hearts: 3,
   factsShown: 0,
   enemies: [], particles: [], popups: [], bounces: new Map(), coinFx: [],
-  rockets: [], coinRain: [], shipRuns: [],
+  rockets: [], coinRain: [], shipRuns: [], splashes: [],
   flagSlide: false, clearT: 0, shake: 0,
   celebrateT: 0, celebrateBonus: 0,
   quizMode: 'level', finalMistakes: 0,
@@ -796,6 +822,7 @@ function loadLevel(idx, keepStats) {
   Game.scrolls = 0; Game.factsShown = 0;
   Game.camX = 0; Game.particles = []; Game.popups = [];
   Game.bounces.clear(); Game.coinFx = [];
+  Game.splashes = []; Game.rockets = []; Game.coinRain = [];
   Game.flagSlide = false; Game.clearT = 0;
   L.coins.forEach(c => c.got = false);
   L.scrolls.forEach(s => s.got = false);
@@ -876,6 +903,14 @@ function moveAndCollide(e, isPlayer) {
 function hitBlock(tx, ty, code) {
   Game.grid[ty][tx] = CODES.USED;
   Game.bounces.set(ty * Game.level.data.w + tx, 0);
+  // destellos dorados al golpear el bloque
+  for (let i = 0; i < 6; i++) {
+    Game.particles.push({
+      x: tx * TILE + 8 + (Math.random() - 0.5) * 10, y: ty * TILE + 2,
+      vx: (Math.random() - 0.5) * 2.2, vy: -(0.6 + Math.random() * 1.4),
+      col: ['#ffd23e', '#fff3b0', '#ffffff'][i % 3], t: 0
+    });
+  }
   if (code === CODES.QCOIN) {
     Game.coins++; addScore(100, tx * TILE + 8, ty * TILE - 4);
     Game.coinFx.push({ x: tx * TILE + 4, y: ty * TILE - 4, vy: -4, t: 0 });
@@ -915,6 +950,7 @@ function updatePlayer() {
   if (keys.jumpBuf > 0 && p.coyote > 0) {
     p.vy = JUMP_V; p.ground = false; p.coyote = 0; keys.jumpBuf = 0;
     AudioSys.sfx('jump');
+    dust(p.x + p.w / 2, p.y + p.h, 5);
   }
   if (!keys.jump && p.vy < -3) p.vy = -3;
 
@@ -928,7 +964,10 @@ function updatePlayer() {
   if (!p.ground) p.anim = 3;
   else if (Math.abs(p.vx) > 0.3) { if (p.animT % 10 === 0) p.anim = (p.anim + 1) % 3; }
   else { p.anim = 0; }
-  if (wasAir && p.ground) p.animT = 0;
+  if (wasAir && p.ground) { p.animT = 0; dust(p.x + p.w / 2, p.y + p.h, 6); }
+  if (p.ground && Math.abs(p.vx) > 2 && p.animT % 14 === 0) {
+    dust(p.x + p.w / 2 - p.face * 4, p.y + p.h, 1);
+  }
 
   if (p.iframes > 0) p.iframes--;
   if (Game.shake > 0) Game.shake--;
@@ -959,11 +998,34 @@ function updatePlayer() {
 function overlap(ax, ay, aw, ah, bx, by, bw, bh) {
   return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }
+function dust(cx, cy, n) {
+  for (let i = 0; i < n; i++) {
+    Game.particles.push({
+      x: cx + (Math.random() - 0.5) * 8, y: cy - 1,
+      vx: (Math.random() - 0.5) * 1.2, vy: -(0.3 + Math.random() * 0.8),
+      col: ['#d8d8d8', '#c4c4c4', '#eeeeee'][i % 3], t: 0
+    });
+  }
+}
 
+function spawnSplash(cx, cy) {
+  // gotas volando
+  for (let i = 0; i < 16; i++) {
+    Game.particles.push({
+      x: cx + (Math.random() - 0.5) * 8, y: cy - 2,
+      vx: (Math.random() - 0.5) * 3.6, vy: -(1.5 + Math.random() * 2.6),
+      col: ['#ffffff', '#bfe6ff', '#5aa8e8'][i % 3], t: 0
+    });
+  }
+  // onda expansiva en la superficie
+  Game.splashes.push({ x: cx, y: cy, t: 0 });
+  Game.splashes.push({ x: cx, y: cy, t: -8 }); // segunda onda con retardo
+}
 function splashDeath() {
   AudioSys.sfx('splash');
   Game.hearts--; updateHUD();
   Game.shake = 12;
+  spawnSplash(Game.player.x + Game.player.w / 2, Game.player.y + Game.player.h);
   if (Game.hearts <= 0) { gameOver(); return; }
   respawn();
 }
@@ -1133,6 +1195,7 @@ function drawBackground() {
   // decoración por tema (paralaje 0.5), anclada al nivel del suelo
   const px = Math.floor(cam * 0.5);
   if (th.deco === 'genoa') {
+    // capa lejana de casas
     ctx.fillStyle = '#8fa5d8';
     for (let i = 0; i < 8; i++) {
       const x = ((i * 160 + 30) - px) % (VIEW_W + 200);
@@ -1150,6 +1213,31 @@ function drawBackground() {
       ctx.fillRect(bx + hw - 11, GROUND_Y - hh + 10, 5, 6);
       ctx.fillRect(bx + hw / 2 - 3, GROUND_Y - 10, 6, 10); // puerta
       ctx.fillStyle = '#8fa5d8';
+    }
+    // capa cercana de casas (paralaje mayor = más profundidad)
+    ctx.fillStyle = '#6f84c4';
+    const px2 = Math.floor(cam * 0.75);
+    for (let i = 0; i < 5; i++) {
+      const x = ((i * 230 + 130) - px2) % (VIEW_W + 260);
+      const bx = ((x + VIEW_W + 260) % (VIEW_W + 260)) - 130;
+      const hw = 46 + (i * 17) % 18, hh = 58 + (i * 23) % 24;
+      ctx.fillRect(bx, GROUND_Y - hh, hw, hh);
+      ctx.beginPath();
+      ctx.moveTo(bx - 5, GROUND_Y - hh);
+      ctx.lineTo(bx + hw / 2, GROUND_Y - hh - 20);
+      ctx.lineTo(bx + hw + 5, GROUND_Y - hh);
+      ctx.fill();
+      ctx.fillStyle = '#54669e'; // ventanas y puerta
+      for (let wx = bx + 8; wx < bx + hw - 8; wx += 14)
+        for (let wy = GROUND_Y - hh + 12; wy < GROUND_Y - 20; wy += 18)
+          ctx.fillRect(wx, wy, 6, 7);
+      ctx.fillRect(bx + hw / 2 - 4, GROUND_Y - 14, 8, 14);
+      ctx.fillStyle = '#6f84c4';
+      // chimenea con humito
+      ctx.fillRect(bx + hw - 12, GROUND_Y - hh - 14, 6, 14);
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillRect(bx + hw - 11, GROUND_Y - hh - 20 - (Game.frame >> 4) % 6, 3, 3);
+      ctx.fillStyle = '#6f84c4';
     }
     // cúpula de la catedral, apoyada en el suelo
     ctx.fillStyle = '#7d92c4';
@@ -1260,6 +1348,16 @@ function render() {
       let oy = 0;
       const bk = Game.bounces.get(ty * L.w + tx);
       if (bk !== undefined) oy = -Math.round(Math.sin((bk / 14) * Math.PI) * 4);
+      if (code === CODES.WATER) {
+        // superficie animada en la fila de agua más alta: crestas + vaivén
+        if (ty > 0 && Game.grid[ty - 1][tx] !== CODES.WATER) {
+          const bob = (Game.frame >> 5) % 2;
+          ctx.drawImage(WATER_TOP_FRAMES[Math.floor(Game.frame / 11) % 3], tx * TILE - cam, ty * TILE - bob);
+        } else {
+          ctx.drawImage(spr, tx * TILE - cam, ty * TILE);
+        }
+        continue;
+      }
       ctx.drawImage(spr, tx * TILE - cam, ty * TILE + oy);
       // hierba / brillo decorativo en la parte superior del suelo
       if (code === CODES.GROUND && th.grass && ty > 0 && Game.grid[ty - 1][tx] === 0) {
@@ -1300,11 +1398,28 @@ function render() {
       Math.round(flagY + Math.round(Math.sin(wave + i * 0.9) * 1)), 4, SPR_FLAG.height);
   }
 
-  // monedas
+  // monedas (con destello periódico)
   for (const c of L.coins) {
     if (c.got) continue;
     const w = Math.max(2, Math.round(Math.abs(Math.cos(Game.frame * 0.08 + c.x)) * 8));
     ctx.drawImage(SPR_COIN, Math.round(c.x - cam + (8 - w) / 2), Math.round(c.y), w, 8);
+    if ((Game.frame + (c.x | 0)) % 70 < 7) {
+      ctx.fillStyle = '#ffffff';
+      const gx = Math.round(c.x + 3 - cam), gy = Math.round(c.y - 4);
+      ctx.fillRect(gx, gy - 1, 2, 4);
+      ctx.fillRect(gx - 1, gy, 4, 2);
+    }
+  }
+  // ondas de salpicadura
+  for (const s of Game.splashes) {
+    if (s.t < 0) continue;
+    const rw = Math.round(4 + s.t * 1.1), rh = 2 + Math.round(s.t * 0.12);
+    ctx.globalAlpha = Math.max(0, 1 - s.t / 30);
+    ctx.fillStyle = '#dff2ff';
+    const sx = Math.round(s.x - cam), sy = Math.round(s.y - 2);
+    ctx.fillRect(sx - Math.round(rw / 2), sy, rw, 2);
+    ctx.fillRect(sx - Math.round(rw / 3), sy - 1, Math.round(rw * 2 / 3), 1);
+    ctx.globalAlpha = 1;
   }
   // monedas que saltan de los bloques
   for (const fx of Game.coinFx) ctx.drawImage(SPR_COIN, Math.round(fx.x - cam), Math.round(fx.y));
@@ -1322,6 +1437,14 @@ function render() {
       continue;
     }
     drawSpriteFlip(e.spr, e.x, e.y, e.vx > 0);
+    // lluvia bajo las nubes de tormenta
+    if (e.type === 'cloud') {
+      ctx.fillStyle = '#5aa8e8';
+      for (let i = 0; i < 3; i++) {
+        const dy = Math.floor((Game.frame * 1.5 + i * 9) % 13);
+        ctx.fillRect(Math.round(e.x - cam + 3 + i * 4), Math.round(e.y + e.h + 1 + dy), 1, 2);
+      }
+    }
   }
   // jugador
   const p = Game.player;
@@ -1366,6 +1489,8 @@ function step() {
   Game.popups = Game.popups.filter(t => t.t < 45);
   for (const pt of Game.particles) { pt.t++; pt.vy += 0.15; pt.x += pt.vx; pt.y += pt.vy; }
   Game.particles = Game.particles.filter(pt => pt.y < VIEW_H + 20 && pt.t < 300);
+  for (const s of Game.splashes) s.t++;
+  Game.splashes = Game.splashes.filter(s => s.t < 30);
 
   if (Game.state === 'PLAY') {
     updatePlayer();
