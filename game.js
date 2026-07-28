@@ -37,19 +37,29 @@ function spriteURL(spr, scale) {
   x.drawImage(spr, 0, 0, c.width, c.height);
   return c.toDataURL();
 }
+function tintSprite(spr, color) {
+  const c = document.createElement('canvas');
+  c.width = spr.width; c.height = spr.height;
+  const x = c.getContext('2d');
+  x.drawImage(spr, 0, 0);
+  x.globalCompositeOperation = 'source-atop';
+  x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
+  return c;
+}
 
 /* ============================ SPRITES ============================ */
 const PAL = {
   h: '#6b3f1d', s: '#f2c187', c: '#b8322e', k: '#7e1f1c', p: '#2e4a8f',
   b: '#4a2c14', w: '#f5efe0', d: '#1c1c1c',
   g: '#9a9a9a', e: '#e0455a', v: '#6b2fa0', V: '#4a1f75',
-  W: '#b9c4d8', n: '#35405c'
+  W: '#b9c4d8', n: '#35405c', Y: '#ffd23e', t: '#d8a0a8'
 };
 
-/* --- Colón (16x16, mirando a la derecha) --- */
+/* --- Colón con sombrero (16x16, mirando a la derecha) --- */
 const BODY = [
   "....dddd........",
-  "...dhhhhhd......",
+  "...dkkkkd.......",
+  "..dkkkkkkd......",
   "..dhhhhhhhd.....",
   "..dssssssssd....",
   "..dssdsdsssd....",
@@ -57,8 +67,7 @@ const BODY = [
   "..dsssddsssd....",
   "...dssssssd.....",
   "..dcdcwccwcd....",
-  "..dccccccccd....",
-  ".ddccccccccdd...",
+  "..dccYccYccd....",
   ".ddccccccccdd...",
   "..dppppppppd...."
 ];
@@ -82,33 +91,33 @@ const SPR_PLAYER_RUN1 = makeSprite(BODY.concat(LEGS_RUN1), PAL);
 const SPR_PLAYER_RUN2 = makeSprite(BODY.concat(LEGS_RUN1.map(r => r.split('').reverse().join(''))), PAL);
 const SPR_PLAYER_JUMP = makeSprite(BODY.concat(LEGS_JUMP), PAL);
 
-/* --- Rata del puerto (16x12) --- */
+/* --- Rata del puerto con cola y orejas (16x12) --- */
 const SPR_RAT = makeSprite([
   "................",
   "................",
   "................",
   "................",
-  "....dd..........",
-  "...dggdd........",
-  "..dgggggdd......",
-  "..dgdggggggdd...",
-  "..dggggggggggd..",
-  ".ddggggggggd....",
-  "..ddddddddd.....",
-  "..d.d..d.d.d...."
+  ".....dd.........",
+  "....dgedd.......",
+  "...dgggggdd.....",
+  "..dgggggdggdd...",
+  ".dgggdgggggggd..",
+  ".dtggggggggggd..",
+  "..dddddddddd....",
+  "...d.d..d.d....."
 ], PAL);
 
-/* --- Cortesano envidioso (12x16) --- */
+/* --- Cortesano envidioso con gorguera (12x16) --- */
 const SPR_COURT = makeSprite([
   "....dddd........",
   "...dhhhhhd......",
   "..dhhhhhhhd.....",
   "..dssssssssd....",
-  "..dsddddsdsd....",
+  "..dsdddsddsd....",
   "..dssssssssd....",
   "..dssddddssd....",
-  "...dwwwwd.......",
-  "..dwwwwwwd......",
+  "...dwwwwwd......",
+  "..dwwwwwwwd.....",
   "..dvvvvvvvd.....",
   ".ddvvvvvvvdd....",
   ".ddvvVvvVvdd....",
@@ -497,7 +506,7 @@ const LEVELS = [];
   L.coinRow(61, 10, 3); L.coinRow(65, 9, 3); L.coinArc(74, 12); L.coinRow(95, 9, 4);
   L.coinRow(119, 13, 4); L.coinArc(118, 8);
   L.scroll(34, 10); L.scroll(66, 8); L.scroll(106, 9);
-  L.enemy(18, G, 'rat'); L.enemy(38, G, 'rat'); L.enemy(66, G, 'rat');
+  L.enemy(18, G, 'rat'); L.enemy(38, G, 'rat'); L.enemy(57, G, 'rat');
   L.enemy(86, G, 'rat'); L.enemy(112, G, 'rat');
   L.start(2, G);
   L.setFlag(135, 15);
@@ -506,7 +515,7 @@ const LEVELS = [];
     theme: {
       skyA: '#7ec8f7', skyB: '#d8f1ff', deco: 'genoa',
       groundTop: '#3fae4a', ground: '#8a5a2c', groundDark: '#5f3c1a',
-      brickA: '#c06048', brickB: '#7e3427'
+      brickA: '#c06048', brickB: '#7e3427', cloud: '#ffffff', grass: '#2f8f3e'
     },
     facts: [
       'Cristóbal Colón nació en Génova (Italia) en el año 1451.',
@@ -557,7 +566,7 @@ const LEVELS = [];
     theme: {
       skyA: '#f2955c', skyB: '#f9dfa8', deco: 'castle',
       groundTop: '#aab2c0', ground: '#7d8494', groundDark: '#565c6a',
-      brickA: '#b0503c', brickB: '#6e2f22'
+      brickA: '#b0503c', brickB: '#6e2f22', cloud: '#ffe3bd', grass: '#c3cad6'
     },
     facts: [
       'Colón estaba convencido de que se podía llegar a Asia navegando hacia el OESTE.',
@@ -623,7 +632,7 @@ const LEVELS = [];
     theme: {
       skyA: '#5fb4f0', skyB: '#d5ecff', deco: 'sea',
       groundTop: '#c08a4e', ground: '#8a5a2c', groundDark: '#5f3c1a',
-      brickA: '#8a5a2c', brickB: '#4e3013'
+      brickA: '#8a5a2c', brickB: '#4e3013', cloud: '#eef8ff', grass: null
     },
     facts: [
       'La Niña y la Pinta eran carabelas ligeras; la Santa María, la nave capitana, era una nao más grande.',
@@ -715,9 +724,16 @@ function spawnEnemy(e) {
     court: { w: 12, h: 14, sp: 0.85, fly: false, spr: SPR_COURT },
     cloud: { w: 14, h: 8, sp: 0.7, fly: true, spr: SPR_CLOUD }
   }[e.type];
+  let yy = e.fly ? e.yTile * TILE : e.yTile * TILE - t.h;
+  // anti-atasco: si aparece dentro de un muro, subir hasta quedar libre
+  for (let i = 0; i < 8; i++) {
+    const inside = isSolid(e.x + 1, yy + 1) || isSolid(e.x + t.w - 1, yy + 1) ||
+      isSolid(e.x + 1, yy + t.h - 1) || isSolid(e.x + t.w - 1, yy + t.h - 1);
+    if (!inside) break;
+    yy -= TILE;
+  }
   return {
-    x: e.x, y: e.fly ? e.yTile * TILE : e.yTile * TILE - t.h,
-    baseY: e.yTile * TILE - t.h,
+    x: e.x, y: yy, baseY: yy,
     w: t.w, h: t.h, vx: -t.sp, vy: 0, sp: t.sp, fly: t.fly,
     spr: t.spr, type: e.type, alive: true, deadT: 0, ph: Math.random() * 6.28
   };
@@ -796,10 +812,12 @@ function updatePlayer() {
     p.y += p.vy;
     return;
   }
-  // entrada
-  if (keys.left) { p.vx -= RUN_ACC * (p.ground ? 1 : 0.6); p.face = -1; }
-  else if (keys.right) { p.vx += RUN_ACC * (p.ground ? 1 : 0.6); p.face = 1; }
+  // entrada: control aéreo con freno para que no sea tan deslizante
+  const acc = p.ground ? RUN_ACC : RUN_ACC * 0.7;
+  if (keys.left) { p.vx -= acc * (p.vx > 0 ? 1.8 : 1); p.face = -1; }
+  else if (keys.right) { p.vx += acc * (p.vx < 0 ? 1.8 : 1); p.face = 1; }
   else if (p.ground) p.vx *= FRICT;
+  else p.vx *= 0.9; // sin tecla en el aire: frena poco a poco
   p.vx = clamp(p.vx, -RUN_MAX, RUN_MAX);
   if (Math.abs(p.vx) < 0.05) p.vx = 0;
 
@@ -986,68 +1004,112 @@ function updateCamera() {
   Game.camX = clamp(Game.camX, 0, Game.level.data.w * TILE - VIEW_W);
 }
 
+let BG_CLOUD = null;
+
 function drawBackground() {
   const th = Game.level.theme;
   const grd = ctx.createLinearGradient(0, 0, 0, VIEW_H);
   grd.addColorStop(0, th.skyA); grd.addColorStop(1, th.skyB);
   ctx.fillStyle = grd; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
   const cam = Math.floor(Game.camX);
+  const GROUND_Y = 240; // línea del nivel del suelo en pantalla
 
   // sol pixelado
   ctx.fillStyle = th.deco === 'castle' ? '#ffdf70' : '#fff4c4';
   ctx.fillRect(40, 26, 24, 24); ctx.fillRect(44, 22, 16, 32);
+  ctx.fillStyle = 'rgba(255,244,196,0.35)';
+  ctx.fillRect(34, 20, 36, 36);
 
-  // nubes con paralaje
+  // pájaros
+  ctx.fillStyle = 'rgba(35,48,74,0.8)';
+  for (let i = 0; i < 3; i++) {
+    const bx = Math.floor(((Game.frame * 0.35 + i * 190) % (VIEW_W + 60)) - 30);
+    const by = Math.floor(26 + i * 24 + Math.sin(Game.frame * 0.02 + i) * 4);
+    const flap = (Game.frame >> 4) % 2;
+    ctx.fillRect(bx, by + (flap ? 0 : 2), 3, 1);
+    ctx.fillRect(bx + 2, by + (flap ? 2 : 1), 2, 1);
+    ctx.fillRect(bx + 4, by + (flap ? 0 : 2), 3, 1);
+  }
+
+  // nubes con paralaje (tintadas según el nivel)
   ctx.save();
   ctx.globalAlpha = 0.92;
   for (let i = 0; i < 9; i++) {
     const cx = ((i * 197 + 60) - cam * 0.25) % (VIEW_W + 140);
     const x = ((cx + VIEW_W + 140) % (VIEW_W + 140)) - 70;
-    ctx.drawImage(SPR_CLOUD_BG, Math.floor(x), 18 + (i * 37) % 60);
+    ctx.drawImage(BG_CLOUD || SPR_CLOUD_BG, Math.floor(x), 18 + (i * 37) % 60);
   }
   ctx.restore();
 
-  // decoración por tema (paralaje 0.5)
+  // decoración por tema (paralaje 0.5), anclada al nivel del suelo
   const px = Math.floor(cam * 0.5);
   if (th.deco === 'genoa') {
     ctx.fillStyle = '#8fa5d8';
     for (let i = 0; i < 8; i++) {
       const x = ((i * 160 + 30) - px) % (VIEW_W + 200);
       const bx = ((x + VIEW_W + 200) % (VIEW_W + 200)) - 100;
-      const hw = 34 + (i * 13) % 22, hh = 40 + (i * 29) % 26;
-      ctx.fillRect(bx, 176 - hh, hw, hh);
+      const hw = 34 + (i * 13) % 22, hh = 44 + (i * 29) % 30;
+      ctx.fillRect(bx, GROUND_Y - hh, hw, hh); // la casa parte del suelo
       ctx.beginPath(); // tejado triangular
-      ctx.moveTo(bx - 4, 176 - hh); ctx.lineTo(bx + hw / 2, 176 - hh - 16); ctx.lineTo(bx + hw + 4, 176 - hh);
+      ctx.moveTo(bx - 4, GROUND_Y - hh);
+      ctx.lineTo(bx + hw / 2, GROUND_Y - hh - 16);
+      ctx.lineTo(bx + hw + 4, GROUND_Y - hh);
       ctx.fill();
+      // ventanitas
+      ctx.fillStyle = '#6a7db8';
+      ctx.fillRect(bx + 6, GROUND_Y - hh + 10, 5, 6);
+      ctx.fillRect(bx + hw - 11, GROUND_Y - hh + 10, 5, 6);
+      ctx.fillRect(bx + hw / 2 - 3, GROUND_Y - 10, 6, 10); // puerta
+      ctx.fillStyle = '#8fa5d8';
     }
-    ctx.fillStyle = '#7d92c4'; // cúpula de la catedral
-    ctx.fillRect(230 - px * 0.2 % 200, 118, 26, 58);
-    ctx.fillRect(234 - px * 0.2 % 200, 110, 18, 8);
-    ctx.fillRect(241 - px * 0.2 % 200, 102, 4, 8);
+    // cúpula de la catedral, apoyada en el suelo
+    ctx.fillStyle = '#7d92c4';
+    const dx = 230 - Math.floor(px * 0.35) % 240;
+    ctx.fillRect(dx, GROUND_Y - 56, 26, 56);
+    ctx.fillRect(dx + 4, GROUND_Y - 64, 18, 8);
+    ctx.fillRect(dx + 11, GROUND_Y - 72, 4, 8);
   } else if (th.deco === 'castle') {
     ctx.fillStyle = '#a3636b';
     const bx = 300 - px;
-    ctx.fillRect(bx, 130, 150, 90);
-    ctx.fillRect(bx + 10, 100, 26, 120);
-    ctx.fillRect(bx + 112, 100, 26, 120);
-    for (let i = 0; i < 5; i++) { ctx.fillRect(bx + 10 + i * 6, 94, 4, 6); ctx.fillRect(bx + 112 + i * 6, 94, 4, 6); }
-    for (let i = 0; i < 9; i++) ctx.fillRect(bx + 6 + i * 17, 122, 8, 8);
-    ctx.fillStyle = '#7c4450';
-    for (let i = 0; i < 18; i++) ctx.fillRect(bx + 8 + (i * 23) % 134, 140 + (i * 31) % 66, 5, 7);
+    ctx.fillRect(bx, GROUND_Y - 80, 150, 80);            // cuerpo principal
+    ctx.fillRect(bx + 10, GROUND_Y - 110, 26, 110);      // torre izquierda
+    ctx.fillRect(bx + 112, GROUND_Y - 110, 26, 110);     // torre derecha
+    for (let i = 0; i < 5; i++) {
+      ctx.fillRect(bx + 10 + i * 6, GROUND_Y - 116, 4, 6);
+      ctx.fillRect(bx + 112 + i * 6, GROUND_Y - 116, 4, 6);
+    }
+    for (let i = 0; i < 9; i++) ctx.fillRect(bx + 6 + i * 17, GROUND_Y - 88, 8, 8);
+    ctx.fillStyle = '#7c4450'; // ventanas
+    for (let i = 0; i < 14; i++) ctx.fillRect(bx + 8 + (i * 23) % 134, GROUND_Y - 70 + (i * 31) % 52, 5, 7);
+    ctx.fillStyle = '#5e3640'; // puerta del castillo
+    ctx.fillRect(bx + 66, GROUND_Y - 26, 18, 26);
   } else if (th.deco === 'sea') {
-    // mar al fondo
-    const sg = ctx.createLinearGradient(0, 190, 0, VIEW_H);
-    sg.addColorStop(0, 'rgba(70,150,220,0.0)'); sg.addColorStop(1, 'rgba(40,110,190,0.85)');
-    ctx.fillStyle = sg; ctx.fillRect(0, 190, VIEW_W, VIEW_H - 190);
-    // carabela lejana
+    // mar con horizonte visible
+    const sg = ctx.createLinearGradient(0, 178, 0, VIEW_H);
+    sg.addColorStop(0, 'rgba(70,150,220,0.0)');
+    sg.addColorStop(1, 'rgba(40,110,190,0.85)');
+    ctx.fillStyle = sg; ctx.fillRect(0, 178, VIEW_W, VIEW_H - 178);
+    ctx.fillStyle = 'rgba(215,240,255,0.5)';
+    ctx.fillRect(0, 203, VIEW_W, 1); // línea de horizonte
+    // olitas lejanas
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    for (let i = 0; i < 12; i++) {
+      const wx = ((i * 97 + 40) - Math.floor(cam * 0.35)) % (VIEW_W + 40);
+      const wxx = ((wx + VIEW_W + 40) % (VIEW_W + 40)) - 20;
+      ctx.fillRect(wxx, 214 + (i * 29) % 52, 10, 1);
+    }
+    // carabela lejana flotando sobre la línea del agua
     const sx = 420 - px;
     ctx.fillStyle = '#6e4a26';
-    ctx.fillRect(sx, 224, 52, 8); ctx.fillRect(sx + 6, 218, 40, 8);
-    ctx.fillRect(sx + 20, 176, 4, 44); ctx.fillRect(sx + 38, 188, 4, 32);
+    ctx.fillRect(sx, 195, 52, 8);
+    ctx.fillRect(sx + 6, 189, 40, 7);
+    ctx.fillRect(sx + 20, 152, 4, 43);
+    ctx.fillRect(sx + 36, 166, 4, 29);
     ctx.fillStyle = '#f5efe0';
-    ctx.fillRect(sx + 12, 180, 18, 22); ctx.fillRect(sx + 32, 192, 14, 16);
+    ctx.fillRect(sx + 13, 156, 16, 22);
+    ctx.fillRect(sx + 29, 170, 12, 15);
     ctx.fillStyle = '#c0392b';
-    ctx.fillRect(sx + 12, 180, 4, 4);
+    ctx.fillRect(sx + 20, 146, 6, 5);
   }
   ctx.fillStyle = 'rgba(255,255,255,0.05)';
   ctx.fillRect(0, 0, VIEW_W, 1);
@@ -1058,7 +1120,20 @@ let SPR_GROUND = null, SPR_BRICK = null, SPR_DECK = woodSprite();
 function buildTileSprites() {
   const th = Game.level.theme;
   SPR_GROUND = groundSprite(th.groundTop, th.ground, th.groundDark);
-  SPR_BRICK = Game.level.theme.deco === 'sea' ? SPR_DECK : brickSprite(th.brickA, th.brickB);
+  SPR_BRICK = th.deco === 'sea' ? SPR_DECK : brickSprite(th.brickA, th.brickB);
+  BG_CLOUD = tintSprite(SPR_CLOUD_BG, th.cloud || '#ffffff');
+  // en el nivel del mar: detectar tramos de cubierta para dibujar los cascos
+  Game.shipRuns = [];
+  if (th.deco === 'sea') {
+    const row = Game.grid[14];
+    let s = -1;
+    for (let x = 0; x < row.length; x++) {
+      const solid = SOLID.has(row[x]);
+      if (solid && s < 0) s = x;
+      if (!solid && s >= 0) { Game.shipRuns.push({ x0: s, x1: x - 1 }); s = -1; }
+    }
+    if (s >= 0) Game.shipRuns.push({ x0: s, x1: row.length - 1 });
+  }
 }
 
 const POLE_CANVAS = (() => { const c = document.createElement('canvas'); c.width = 2; c.height = 16; const x = c.getContext('2d'); x.drawImage(SPR_POLE, 0, 0, 2, 2, 0, 0, 2, 16); return c; })();
@@ -1097,15 +1172,44 @@ function render() {
       const bk = Game.bounces.get(ty * L.w + tx);
       if (bk !== undefined) oy = -Math.round(Math.sin((bk / 14) * Math.PI) * 4);
       ctx.drawImage(spr, tx * TILE - cam, ty * TILE + oy);
+      // hierba / brillo decorativo en la parte superior del suelo
+      if (code === CODES.GROUND && th.grass && ty > 0 && Game.grid[ty - 1][tx] === 0) {
+        ctx.fillStyle = th.grass;
+        const h1 = 2 + ((tx * 13 + ty * 7) % 3);
+        const h2 = 2 + ((tx * 7 + ty * 5) % 2);
+        ctx.fillRect(tx * TILE + 3 - cam, ty * TILE - h1 + oy, 1, h1);
+        ctx.fillRect(tx * TILE + 10 - cam, ty * TILE - h2 + oy, 1, h2);
+      }
+    }
+  }
+  // cascos de los barcos (nivel del mar)
+  if (Game.shipRuns && Game.shipRuns.length) {
+    for (const r of Game.shipRuns) {
+      const x = r.x0 * TILE - cam, w = (r.x1 - r.x0 + 1) * TILE;
+      if (x + w < 0 || x > VIEW_W) continue;
+      ctx.fillStyle = '#4e3013';
+      ctx.fillRect(x, 240, w, 14);
+      ctx.fillRect(x + 3, 254, w - 6, 3);
+      ctx.fillStyle = '#3a220d';
+      ctx.fillRect(x + 2, 254, w - 4, 2);
+      ctx.fillStyle = '#20140a'; // ojos de buey
+      for (let hx = x + 12; hx < x + w - 10; hx += 28) ctx.fillRect(hx, 246, 4, 4);
+      ctx.fillStyle = 'rgba(255,255,255,0.55)'; // espuma sobre el agua
+      ctx.fillRect(x - 2, 257, w + 4, 1);
     }
   }
 
-  // bandera
+  // bandera ondeando (dibujada en franjas con desfase)
   const f = L.flag;
   for (let y = f.top; y < f.base; y += 16) ctx.drawImage(POLE_CANVAS, f.x - cam, y);
   ctx.drawImage(SPR_BALL, f.x - 3 - cam, f.top - 4);
   const flagY = Game.flagSlide ? Math.min(f.base - 16, f.top + Game.clearT * 1.5) : f.top + 4;
-  ctx.drawImage(SPR_FLAG, f.x + 2 - cam, flagY);
+  const wave = Game.frame * 0.12;
+  for (let i = 0; i < 3; i++) {
+    ctx.drawImage(SPR_FLAG, i * 4, 0, 4, SPR_FLAG.height,
+      Math.round(f.x + 2 - cam + i * 4),
+      Math.round(flagY + Math.round(Math.sin(wave + i * 0.9) * 1)), 4, SPR_FLAG.height);
+  }
 
   // monedas
   for (const c of L.coins) {
