@@ -90,7 +90,7 @@ canvas {
 }
 @keyframes bob { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-6px);} }
 
-.subtitle { font-size: clamp(8px, 1.4vw, 11px); color: #9fd8ff; line-height: 1.7; }
+.subtitle { font-size: clamp(10px, 1.9vmin, 14px); color: #9fd8ff; line-height: 1.7; }
 
 .panel {
   background: #232c4f;
@@ -105,7 +105,7 @@ canvas {
   font-weight: 700;
   letter-spacing: 0.01em;
 }
-.panel p { font-size: clamp(11px, 2vmin, 14px); line-height: 1.7; }
+.panel p { font-size: clamp(13px, 2.4vmin, 18px); line-height: 1.7; }
 .panel b { color: var(--gold); }
 
 .parchment {
@@ -118,32 +118,32 @@ canvas {
 .parchment h3 { color: #6b4a1f; }
 
 .modal {
-  max-width: min(86%, 560px);
-  max-height: 88%;
+  max-width: min(90%, 660px);
+  max-height: 90%;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   align-items: center;
-  padding: 18px 24px;
+  padding: 22px 30px;
 }
-.modal h3 { font-size: clamp(11px, 2vmin, 15px); color: var(--gold); text-shadow: 2px 2px 0 #000; letter-spacing: 0.04em; }
+.modal h3 { font-size: clamp(14px, 2.6vmin, 20px); color: var(--gold); text-shadow: 2px 2px 0 #000; letter-spacing: 0.04em; }
 /* Bloque de frase histórica: grande y compacto */
 .fact-text {
-  font-size: clamp(13px, 2.6vmin, 18px);
-  line-height: 1.65;
-  max-width: 30em;
+  font-size: clamp(16px, 3vmin, 24px);
+  line-height: 1.55;
+  max-width: 32em;
   text-align: center;
 }
 
 .btn {
   font-family: inherit;
-  font-size: clamp(8px, 1.3vw, 11px);
+  font-size: clamp(11px, 2.2vmin, 16px);
   background: var(--red);
   color: #fff;
   border: 4px solid #0d1126;
   box-shadow: inset -4px -4px 0 #0006, 0 5px 0 #0009;
-  padding: 10px 18px;
+  padding: 12px 22px;
   cursor: pointer;
   text-shadow: 2px 2px 0 #000;
 }
@@ -152,7 +152,7 @@ canvas {
 .btn.big { background: var(--sea); }
 
 .controls { line-height: 2; }
-.high { font-size: 9px; color: var(--gold); text-shadow: 2px 2px 0 #000; }
+.high { font-size: clamp(11px, 2vmin, 15px); color: var(--gold); text-shadow: 2px 2px 0 #000; }
 
 /* ---------- Intro nivel ---------- */
 #intro { background: #05070f; }
@@ -167,26 +167,26 @@ canvas {
 .intro-sub { font-size: clamp(8px, 1.3vw, 11px); color: var(--parchment); }
 
 /* ---------- Quiz ---------- */
-.quiz-q { font-size: clamp(13px, 2.4vmin, 17px); line-height: 1.6; color: #fff; text-shadow: 1px 2px 0 #000; }
-#quiz-answers { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-#quiz-answers .btn { width: 100%; background: #31406e; font-size: clamp(10px, 2vmin, 13px); line-height: 1.5; padding: 12px 14px; }
+.quiz-q { font-size: clamp(15px, 2.8vmin, 22px); line-height: 1.55; color: #fff; text-shadow: 1px 2px 0 #000; }
+#quiz-answers { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+#quiz-answers .btn { width: 100%; background: #31406e; font-size: clamp(13px, 2.4vmin, 18px); line-height: 1.5; padding: 14px 16px; }
 #quiz-answers .btn.right { background: #2e8b57; }
 #quiz-answers .btn.wrong { background: #8b2222; animation: shake 0.3s; }
 @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
-.feedback { min-height: 16px; font-size: clamp(11px, 2vmin, 14px); color: var(--gold); }
+.feedback { min-height: 18px; font-size: clamp(13px, 2.4vmin, 18px); color: var(--gold); }
 
 /* ---------- Listas de hechos ---------- */
 .facts-list {
-  max-height: 34vh;
+  max-height: 32vh;
   overflow-y: auto;
   text-align: left;
-  font-size: clamp(11px, 2vmin, 14px);
+  font-size: clamp(13px, 2.2vmin, 17px);
   line-height: 1.7;
-  padding: 4px 8px;
+  padding: 4px 10px;
 }
 .facts-list p { margin-bottom: 6px; }
 .facts-list p::before { content: "📜 "; }
-.score-line { font-size: clamp(12px, 2.4vmin, 16px); }
+.score-line { font-size: clamp(14px, 2.6vmin, 20px); }
 
 /* Scanlines sutiles estilo CRT sobre el canvas (no sobre los textos) */
 #game-wrap::after {

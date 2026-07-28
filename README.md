@@ -25,6 +25,9 @@ No requiere instalación ni conexión (la fuente pixel de Google es opcional).
 - 🚩 Al final de cada nivel, la bandera lanza un **reto de historia** (quiz) para poder continuar.
 - ❤️ Tres corazones por nivel; el agua y los fosos quitan uno.
 - P o ESC abre la **bitácora**: un repaso de todo lo aprendido.
+- 🎵 **Cada nivel tiene su propia canción chiptune** (Génova, la corte y una jiga marinera).
+- 🎓 Al superar los 3 niveles hay un **EXAMEN FINAL** de 5 preguntas: si lo aciertas todo
+  a la primera… **¡fuegos artificiales y lluvia de monedas!** 🎆
 
 ## Niveles
 1. **Génova, 1451** — la infancia y juventud de Colón como marino.

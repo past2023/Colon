@@ -412,27 +412,69 @@ const AudioSys = {
       case 'wrong': this.tone(160, 0.35, 'sawtooth', 0.14, 110); break;
       case 'click': this.tone(700, 0.05, 'square', 0.08); break;
       case 'splash': this.tone(300, 0.25, 'sine', 0.13, 60); break;
+      case 'launch': this.tone(300, 0.35, 'sine', 0.1, 900); break;
+      case 'boom':
+        this.tone(120, 0.35, 'sawtooth', 0.16, 40);
+        this.tone(70, 0.5, 'square', 0.1, 30, n + 0.06);
+        break;
       case 'win':
         [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => this.tone(f, 0.18, 'square', 0.13, null, n + i * 0.14));
         break;
     }
   },
-  LEAD: [
-    74, 74, 0, 74, 0, 72, 74, 0, 79, 0, 77, 0, 76, 0, 0, 0,
-    72, 72, 0, 72, 0, 74, 76, 0, 77, 0, 76, 0, 74, 0, 0, 0,
-    74, 74, 0, 74, 0, 72, 74, 0, 79, 0, 77, 0, 76, 0, 81, 0,
-    79, 0, 77, 0, 76, 0, 74, 0, 72, 0, 74, 0, 0, 0, 0, 0
+  /* -------- canciones distintas por nivel -------- */
+  SONGS: [
+    { // Nivel 1 · Génova: melodía aventurera
+      tempo: 150,
+      lead: [
+        74, 74, 0, 74, 0, 72, 74, 0, 79, 0, 77, 0, 76, 0, 0, 0,
+        72, 72, 0, 72, 0, 74, 76, 0, 77, 0, 76, 0, 74, 0, 0, 0,
+        74, 74, 0, 74, 0, 72, 74, 0, 79, 0, 77, 0, 76, 0, 81, 0,
+        79, 0, 77, 0, 76, 0, 74, 0, 72, 0, 74, 0, 0, 0, 0, 0
+      ],
+      bass: [50, 0, 53, 0, 57, 0, 53, 0, 48, 0, 52, 0, 55, 0, 48, 0]
+    },
+    { // Nivel 2 · La corte: marcha solemne
+      tempo: 122,
+      lead: [
+        69, 0, 72, 0, 71, 0, 69, 0, 67, 0, 69, 0, 64, 0, 0, 0,
+        69, 0, 72, 0, 76, 0, 74, 0, 71, 0, 67, 0, 69, 0, 0, 0,
+        67, 0, 69, 0, 72, 0, 76, 0, 74, 0, 72, 0, 71, 0, 0, 0,
+        69, 0, 71, 0, 72, 0, 69, 0, 68, 0, 64, 0, 69, 0, 0, 0
+      ],
+      bass: [45, 0, 0, 0, 52, 0, 0, 0, 48, 0, 0, 0, 45, 0, 45, 0]
+    },
+    { // Nivel 3 · El mar: jiga marinera 6/8
+      tempo: 172,
+      lead: [
+        67, 71, 74, 67, 71, 74, 79, 0, 76, 74, 71, 67,
+        71, 74, 76, 71, 74, 76, 81, 0, 79, 76, 74, 71,
+        67, 71, 74, 67, 71, 74, 79, 0, 76, 74, 71, 67,
+        74, 76, 74, 71, 74, 71, 67, 0, 0, 0, 0, 0
+      ],
+      bass: [43, 0, 0, 43, 0, 0, 48, 0, 0, 50, 0, 0]
+    }
   ],
-  BASS: [50, 0, 53, 0, 57, 0, 53, 0, 48, 0, 52, 0, 55, 0, 48, 0],
+  song: null,
+  setSong(i) {
+    this.song = this.SONGS[clamp(i, 0, this.SONGS.length - 1)];
+    this.step = 0;
+    if (this.musicTimer) {
+      clearInterval(this.musicTimer);
+      this.musicTimer = null;
+      this.startMusic();
+    }
+  },
   startMusic() {
     if (!this.ctx || this.musicTimer) return;
-    const stepDur = (60 / 150) / 2 * 1000;
+    if (!this.song) this.song = this.SONGS[0];
+    const stepDur = (60 / this.song.tempo) / 2 * 1000;
     this.musicTimer = setInterval(() => {
       if (this.muted) return;
-      const i = this.step % this.LEAD.length;
-      const m = this.LEAD[i];
+      const i = this.step % this.song.lead.length;
+      const m = this.song.lead[i];
       if (m) this.tone(440 * Math.pow(2, (m - 69) / 12), 0.19, 'square', 0.045);
-      const b = this.BASS[this.step % this.BASS.length];
+      const b = this.song.bass[this.step % this.song.bass.length];
       if (b) this.tone(440 * Math.pow(2, (b - 69) / 12), 0.24, 'triangle', 0.07);
       this.step++;
     }, stepDur);
@@ -663,6 +705,50 @@ const LEVELS = [];
   });
 })();
 
+/* -------- EXAMEN FINAL (tras superar los 3 niveles) -------- */
+const FINAL_EXAM = [
+  {
+    q: '¿En qué año nació Cristóbal Colón?',
+    answers: [
+      { t: 'En 1451', right: true },
+      { t: 'En 1492', right: false },
+      { t: 'En 1506', right: false }
+    ]
+  },
+  {
+    q: '¿Desde qué puerto zarpó la expedición el 3 de agosto de 1492?',
+    answers: [
+      { t: 'Desde el puerto de Palos', right: true },
+      { t: 'Desde el puerto de Cádiz', right: false },
+      { t: 'Desde el puerto de Barcelona', right: false }
+    ]
+  },
+  {
+    q: '¿Quién gritó «¡TIERRA!» el 12 de octubre de 1492?',
+    answers: [
+      { t: 'Rodrigo de Triana', right: true },
+      { t: 'La reina Isabel', right: false },
+      { t: 'El propio Colón', right: false }
+    ]
+  },
+  {
+    q: '¿Cómo se llamaba la isla donde Colón desembarcó primero?',
+    answers: [
+      { t: 'Guanahani (bautizada San Salvador)', right: true },
+      { t: 'Cuba', right: false },
+      { t: 'La Española', right: false }
+    ]
+  },
+  {
+    q: '¿Cuántos viajes hizo Colón a América en total?',
+    answers: [
+      { t: 'Cuatro viajes', right: true },
+      { t: 'Un solo viaje', right: false },
+      { t: 'Diez viajes', right: false }
+    ]
+  }
+];
+
 /* ============================ ESTADO ============================ */
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -675,7 +761,10 @@ const Game = {
   score: 0, coins: 0, scrolls: 0, hearts: 3,
   factsShown: 0,
   enemies: [], particles: [], popups: [], bounces: new Map(), coinFx: [],
+  rockets: [], coinRain: [], shipRuns: [],
   flagSlide: false, clearT: 0, shake: 0,
+  celebrateT: 0, celebrateBonus: 0,
+  quizMode: 'level', finalMistakes: 0,
   player: {
     x: 0, y: 0, w: 10, h: 14, vx: 0, vy: 0,
     face: 1, ground: false, coyote: 0, iframes: 0, anim: 0, animT: 0, dead: false
@@ -1245,6 +1334,15 @@ function render() {
     ctx.fillStyle = pt.col;
     ctx.fillRect(Math.round(pt.x - cam), Math.round(pt.y), 3, 3);
   }
+  // cohetes y lluvia de monedas (celebración final, en coordenadas de pantalla)
+  for (const r of Game.rockets) {
+    ctx.fillStyle = r.col;
+    ctx.fillRect(Math.round(r.x), Math.round(r.y), 3, 6);
+  }
+  for (const c of Game.coinRain) {
+    const w = Math.max(2, Math.round(Math.abs(Math.cos(c.ph)) * 8));
+    ctx.drawImage(SPR_COIN, Math.round(c.x + (8 - w) / 2), Math.round(c.y), w, 8);
+  }
   // textos flotantes
   ctx.font = 'bold 8px monospace';
   ctx.textAlign = 'center';
@@ -1282,6 +1380,63 @@ function step() {
     moveAndCollide(p, false);
     if (Math.abs(p.vx) > 0.3 && Game.clearT % 10 === 0) p.anim = (p.anim + 1) % 3;
     if (Game.clearT === 80) openQuiz();
+  } else if (Game.state === 'CELEBRATE') {
+    Game.celebrateT++;
+    updateCamera();
+    const p = Game.player;
+    // Colón salta de alegría
+    p.vy = Math.min(p.vy + GRAV, MAXFALL);
+    moveAndCollide(p, false);
+    if (Game.celebrateT % 90 === 45 && p.ground) { p.vy = -6; AudioSys.sfx('jump'); }
+    if (!p.ground) p.anim = 3;
+    else if (Game.celebrateT % 10 === 0) p.anim = (p.anim + 1) % 3;
+
+    // lanzar cohetes
+    if (Game.celebrateT < 300 && Game.celebrateT % 24 === 0) {
+      Game.rockets.push({
+        x: 40 + Math.random() * (VIEW_W - 80), y: VIEW_H + 6,
+        vy: -(3.1 + Math.random() * 1.4), ty: 44 + Math.random() * 90,
+        col: ['#ffd23e', '#e0455a', '#3fae4a', '#5aa8e8', '#ff8ad8'][(Math.random() * 5) | 0]
+      });
+      AudioSys.sfx('launch');
+    }
+    for (const r of Game.rockets) {
+      r.y += r.vy;
+      const wx = Game.camX + r.x; // las partículas usan coordenadas de mundo
+      Game.particles.push({ x: wx, y: r.y + 6, vx: (Math.random() - 0.5) * 0.5, vy: 0.7, col: '#fff4c4', t: 0 });
+      if (r.y <= r.ty) {
+        r.boom = true;
+        AudioSys.sfx('boom');
+        for (let i = 0; i < 26; i++) {
+          const a = (i / 26) * Math.PI * 2, sp = 0.7 + Math.random() * 2.1;
+          Game.particles.push({ x: wx, y: r.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, col: r.col, t: 0 });
+        }
+      }
+    }
+    Game.rockets = Game.rockets.filter(r => !r.boom);
+
+    // lluvia de monedas (cada una suma puntos al pasar)
+    if (Game.celebrateT < 260 && Game.celebrateT % 7 === 0 && Game.celebrateBonus < 300) {
+      Game.coinRain.push({
+        x: 8 + Math.random() * (VIEW_W - 16), y: -10,
+        vy: 1.2 + Math.random() * 1.6, ph: Math.random() * 6.28, counted: false
+      });
+    }
+    for (const c of Game.coinRain) {
+      c.y += c.vy; c.ph += 0.1;
+      c.x += Math.sin(c.ph) * 0.4;
+      if (!c.counted && c.y > VIEW_H * 0.55) {
+        c.counted = true;
+        if (Game.celebrateBonus < 300) {
+          Game.celebrateBonus += 10;
+          addScore(10, Game.camX + c.x, c.y);
+          if (Game.celebrateBonus % 30 === 0) AudioSys.sfx('coin');
+        }
+      }
+    }
+    Game.coinRain = Game.coinRain.filter(c => c.y < VIEW_H + 12);
+
+    if (Game.celebrateT === 430) winGame(true);
   }
   render();
 }
@@ -1324,6 +1479,7 @@ function showIntro() {
 }
 
 function startLevel(idx, fresh) {
+  AudioSys.setSong(idx);
   loadLevel(idx, !fresh);
   buildTileSprites();
   updateHUD();
@@ -1342,10 +1498,21 @@ function shuffle(a) {
 }
 function openQuiz() {
   Game.state = 'QUIZ';
+  Game.quizMode = 'level';
   quizQueue = shuffle(Game.level.quiz);
   quizRight = 0;
   document.getElementById('quiz-h3').textContent =
     '🚩 RETO DE ' + Game.level.name + ' — ¡Responde para continuar el viaje!';
+  showQuizQuestion();
+  show('quiz');
+}
+function openFinalExam() {
+  Game.state = 'QUIZ';
+  Game.quizMode = 'final';
+  Game.finalMistakes = 0;
+  quizQueue = shuffle(FINAL_EXAM);
+  document.getElementById('quiz-h3').textContent =
+    '🎓 EXAMEN FINAL — ¡Demuestra todo lo que aprendiste de Colón!';
   showQuizQuestion();
   show('quiz');
 }
@@ -1373,24 +1540,47 @@ function answerQuiz(btn, ans) {
     setTimeout(() => {
       quizQueue.shift();
       if (quizQueue.length) showQuizQuestion();
-      else nextLevel();
+      else if (Game.quizMode === 'final') {
+        if (Game.finalMistakes === 0) startCelebration();
+        else winGame(false);
+      } else nextLevel();
     }, 900);
   } else {
     btn.classList.add('wrong');
     btn.disabled = true;
     AudioSys.sfx('wrong');
+    if (Game.quizMode === 'final') Game.finalMistakes++;
     fb.textContent = '¡Uy! Esa no es… prueba otra vez.';
   }
 }
 function nextLevel() {
   hideAll();
   const next = Game.levelIdx + 1;
-  if (next >= LEVELS.length) { winGame(); return; }
+  if (next >= LEVELS.length) { openFinalExam(); return; }
   startLevel(next, true);
 }
-function winGame() {
+
+/* -------- celebración: fuegos artificiales + lluvia de monedas -------- */
+function startCelebration() {
+  hideAll();
+  Game.state = 'CELEBRATE';
+  Game.celebrateT = 0;
+  Game.celebrateBonus = 0;
+  Game.rockets = [];
+  Game.coinRain = [];
+  AudioSys.sfx('win');
+}
+
+function winGame(perfect) {
   Game.state = 'WIN';
   AudioSys.sfx('win');
+  Game.rockets = []; Game.coinRain = [];
+  const note = document.getElementById('win-note');
+  if (perfect) {
+    note.textContent = '⭐ ¡EXAMEN PERFECTO! ⭐ Respondiste todo a la primera: ¡merecidos los fuegos artificiales y la lluvia de monedas!';
+  } else {
+    note.textContent = 'Consejo: supera el examen final sin fallar ninguna pregunta y verás los FUEGOS ARTIFICIALES con lluvia de monedas 🎆';
+  }
   document.getElementById('win-score').textContent = Game.score;
   const hi = Math.max(Game.score, +(store.get('colonHigh') || 0));
   store.set('colonHigh', hi);
