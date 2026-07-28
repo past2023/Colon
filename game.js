@@ -554,8 +554,8 @@ const LEVELS = [];
   const L = levelBuilder(140, 18);
   const G = 15; // fila superior del suelo
   L.ground(0, 29, G); L.ground(32, 49, G); L.ground(53, 74, G); L.ground(79, 139, G);
-  // canales de agua animada en los fosos
-  L.water(30, 31, 16); L.water(50, 52, 16); L.water(75, 78, 16);
+  // canales de agua animada en los fosos (a ras del suelo)
+  L.water(30, 31, 15); L.water(50, 52, 15); L.water(75, 78, 15);
   L.fill(10, 11, 1, 1, CODES.QCOIN); L.fill(12, 11, 1, 1, CODES.QSCROLL); L.fill(14, 11, 1, 1, CODES.QCOIN);
   L.fill(20, 12, 4, 1, CODES.BRICK); L.fill(21, 12, 1, 1, CODES.QCOIN);
   L.fill(27, 11, 1, 1, CODES.QSCROLL);
@@ -607,8 +607,8 @@ const LEVELS = [];
   const L = levelBuilder(150, 18);
   const G = 15;
   L.ground(0, 34, G); L.ground(38, 69, G); L.ground(74, 109, G); L.ground(113, 149, G);
-  // canales de agua animada en los fosos
-  L.water(35, 37, 16); L.water(70, 73, 16); L.water(110, 112, 16);
+  // canales de agua animada en los fosos (a ras del suelo)
+  L.water(35, 37, 15); L.water(70, 73, 15); L.water(110, 112, 15);
   L.fill(8, 11, 1, 1, CODES.QCOIN); L.fill(10, 11, 1, 1, CODES.QSCROLL); L.fill(12, 11, 1, 1, CODES.QCOIN);
   L.fill(18, 12, 4, 1, CODES.BRICK);
   L.fill(24, 11, 1, 1, CODES.QSCROLL);
@@ -1157,6 +1157,60 @@ function updateCamera() {
 
 let BG_CLOUD = null;
 
+/* Carabela grande de fondo con su nombre (nivel del mar) */
+function drawCaravel(x, w, name, big) {
+  if (x + w < -60 || x > VIEW_W + 60) return;
+  x = Math.round(x);
+  const baseY = 214; // línea de flotación sobre el horizonte
+  // casco
+  ctx.fillStyle = '#5f3c1a';
+  ctx.fillRect(x + 6, baseY - 12, w - 12, 12);
+  ctx.fillRect(x + 12, baseY, w - 24, 4);
+  ctx.fillStyle = '#4e3013';
+  ctx.fillRect(x + 16, baseY + 4, w - 32, 2);
+  ctx.fillStyle = '#a06a34'; // banda de la cubierta
+  ctx.fillRect(x + 6, baseY - 14, w - 12, 3);
+  // castillo de popa
+  ctx.fillStyle = '#6e4a26';
+  ctx.fillRect(x, baseY - 24, 16, 24);
+  ctx.fillStyle = '#8a5a2c';
+  ctx.fillRect(x + 2, baseY - 28, 12, 6);
+  // proa
+  ctx.fillStyle = '#6e4a26';
+  ctx.fillRect(x + w - 9, baseY - 18, 9, 16);
+  // ojos de buey
+  ctx.fillStyle = '#2a1808';
+  for (let hx = x + 12; hx < x + w - 14; hx += 12) ctx.fillRect(hx, baseY - 8, 3, 3);
+  // mástiles con cofas, velas y banderolas
+  const mH = big ? 64 : 56; // la Santa María (nao) es la mayor
+  const masts = [x + Math.round(w * 0.28), x + Math.round(w * 0.52), x + Math.round(w * 0.78)];
+  masts.forEach((mx, i) => {
+    const hh = mH - i * 8;
+    ctx.fillStyle = '#4e3013';
+    ctx.fillRect(mx, baseY - 14 - hh, 3, hh);
+    ctx.fillRect(mx - 3, baseY - 14 - hh + 8, 9, 3); // cofa
+    const sw = 22 - i * 3;
+    ctx.fillStyle = '#f5efe0';
+    ctx.fillRect(mx - Math.round(sw / 2) + 1, baseY - 10 - hh, sw, Math.round(hh * 0.45));
+    if (i === 1) { // cruz roja en la vela mayor
+      ctx.fillStyle = '#c0392b';
+      const cy0 = baseY - 10 - hh;
+      ctx.fillRect(mx - 1, cy0 + 2, 2, Math.round(hh * 0.45) - 4);
+      ctx.fillRect(mx - Math.round(sw / 2) + 4, cy0 + Math.round(hh * 0.22), sw - 6, 2);
+    }
+    ctx.fillStyle = '#c0392b';
+    ctx.fillRect(mx + 3, baseY - 16 - hh, 7, 3); // banderola
+  });
+  // nombre de la carabela sobre ella
+  ctx.font = 'bold 9px monospace';
+  ctx.textAlign = 'center';
+  const nx = x + Math.round(w / 2), ny = baseY - 14 - mH - 16;
+  ctx.fillStyle = '#0d2b45';
+  ctx.fillText(name, nx + 1, ny + 1);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(name, nx, ny);
+}
+
 function drawBackground() {
   const th = Game.level.theme;
   const grd = ctx.createLinearGradient(0, 0, 0, VIEW_H);
@@ -1275,18 +1329,13 @@ function drawBackground() {
       const wxx = ((wx + VIEW_W + 40) % (VIEW_W + 40)) - 20;
       ctx.fillRect(wxx, 214 + (i * 29) % 52, 10, 1);
     }
-    // carabela lejana flotando sobre la línea del agua
-    const sx = 420 - px;
-    ctx.fillStyle = '#6e4a26';
-    ctx.fillRect(sx, 195, 52, 8);
-    ctx.fillRect(sx + 6, 189, 40, 7);
-    ctx.fillRect(sx + 20, 152, 4, 43);
-    ctx.fillRect(sx + 36, 166, 4, 29);
-    ctx.fillStyle = '#f5efe0';
-    ctx.fillRect(sx + 13, 156, 16, 22);
-    ctx.fillRect(sx + 29, 170, 12, 15);
-    ctx.fillStyle = '#c0392b';
-    ctx.fillRect(sx + 20, 146, 6, 5);
+    // tres grandes carabelas de la expedición con su nombre
+    const CARAVELS = [
+      { x: 140, w: 96, name: 'LA NIÑA', big: false },
+      { x: 980, w: 120, name: 'LA SANTA MARÍA', big: true },
+      { x: 1890, w: 96, name: 'LA PINTA', big: false }
+    ];
+    for (const sh of CARAVELS) drawCaravel(sh.x - px, sh.w, sh.name, sh.big);
   }
   ctx.fillStyle = 'rgba(255,255,255,0.05)';
   ctx.fillRect(0, 0, VIEW_W, 1);
@@ -1584,7 +1633,7 @@ function updateHUD() {
   document.getElementById('hud-coins').textContent = '× ' + Game.coins;
   document.getElementById('hud-scrolls').textContent = '× ' + Game.scrolls;
   document.getElementById('hud-level').textContent =
-    Game.level ? Game.level.name.toUpperCase() : '';
+    Game.level ? ('📍 ' + Game.level.name.toUpperCase() + ' · ' + Game.level.title) : '';
   const hc = document.getElementById('hud-hearts');
   hc.innerHTML = '';
   for (let i = 0; i < 3; i++) {
@@ -1814,10 +1863,10 @@ document.getElementById('btn-retry').onclick = () => {
 document.getElementById('btn-music').onclick = () => { AudioSys.init(); AudioSys.toggle(); };
 
 /* ============================ ARRANQUE ============================ */
-const URL_HEART = spriteURL(SPR_HEART, 2);
-const URL_HEART_OFF = spriteURL(SPR_HEART_OFF, 2);
-document.getElementById('hud-coin-img').src = spriteURL(SPR_COIN, 2);
-document.getElementById('hud-scroll-img').src = spriteURL(SPR_SCROLL, 2);
+const URL_HEART = spriteURL(SPR_HEART, 3);
+const URL_HEART_OFF = spriteURL(SPR_HEART_OFF, 3);
+document.getElementById('hud-coin-img').src = spriteURL(SPR_COIN, 3);
+document.getElementById('hud-scroll-img').src = spriteURL(SPR_SCROLL, 3);
 
 // dibuja el primer nivel detrás del menú
 loadLevel(0, false);

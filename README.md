@@ -34,7 +34,10 @@ No requiere instalación ni conexión (la fuente pixel de Google es opcional).
 1. **Génova, 1451** — la infancia y juventud de Colón como marino.
 2. **La Corte, 1486–1492** — convencer a los Reyes Católicos y firmar las Capitulaciones.
 3. **¡A toda vela! 1492** — la Niña, la Pinta y la Santa María cruzando el Atlántico
-   hasta el 12 de octubre de 1492.
+   hasta el 12 de octubre de 1492. En el fondo se ven las **tres grandes carabelas
+   con sus nombres**.
+
+El HUD superior muestra siempre **dónde se encuentra el jugador** (📍 nivel + lugar).
 
 ## Estructura
 - `index.html` — página y overlays (menú, hechos, quiz, victoria…).
