@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>La Aventura de Colón — Juego de plataformas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="stage">
+    <!-- HUD -->
+    <div id="hud">
+      <div class="hud-group" id="hud-hearts" title="Vidas"></div>
+      <div class="hud-group"><img id="hud-coin-img" alt="maravedí"> <span id="hud-coins">× 0</span></div>
+      <div class="hud-group"><img id="hud-scroll-img" alt="página de bitácora"> <span id="hud-scrolls">× 0</span></div>
+      <div class="hud-group hud-score">PUNTOS <span id="hud-score">0</span></div>
+      <div class="hud-group hud-level" id="hud-level">NIVEL 1</div>
+      <button id="btn-music" class="hud-btn" title="Música (M)">♪</button>
+    </div>
+
+    <!-- Juego -->
+    <div id="game-wrap">
+      <canvas id="game" width="512" height="288"></canvas>
+
+      <!-- Pantalla de título -->
+      <div id="menu" class="overlay">
+        <h1 class="title">LA AVENTURA<br>DE COLÓN</h1>
+        <p class="subtitle">Un viaje en 8 bits por la vida de Cristóbal Colón</p>
+        <div class="panel story">
+          <p>Génova, 1451. Un joven soñador cree que se puede llegar a Asia
+          navegando <b>hacia el oeste</b>. Ayúdale a reunir páginas de su
+          bitácora, esquivar los peligros del mar y convencer a los
+          Reyes Católicos.</p>
+        </div>
+        <button id="btn-start" class="btn big">▶ EMPEZAR EL VIAJE</button>
+        <div class="panel controls">
+          <p>⌨ <b>← →</b> o <b>A D</b> moverse · <b>↑ / W / ESPACIO</b> saltar</p>
+          <p><b>P</b> pausa / bitácora · <b>M</b> música</p>
+          <p>📜 Recoge las páginas para aprender · 🚩 Llega a la bandera y responde el reto final</p>
+        </div>
+        <p id="menu-high" class="high"></p>
+      </div>
+
+      <!-- Presentación de nivel -->
+      <div id="intro" class="overlay hidden">
+        <p class="intro-small" id="intro-num">NIVEL 1</p>
+        <h2 class="intro-title" id="intro-title">GÉNOVA, 1451</h2>
+        <p class="intro-sub" id="intro-sub">La infancia de un soñador</p>
+      </div>
+
+      <!-- Modal de hecho histórico -->
+      <div id="fact" class="overlay hidden">
+        <div class="panel modal parchment">
+          <h3>📜 PÁGINA DE LA BITÁCORA</h3>
+          <p id="fact-text" class="fact-text"></p>
+          <button id="btn-fact-ok" class="btn">¡Entendido!</button>
+        </div>
+      </div>
+
+      <!-- Modal de pregunta -->
+      <div id="quiz" class="overlay hidden">
+        <div class="panel modal">
+          <h3 id="quiz-h3">🚩 RETO DEL NIVEL</h3>
+          <p id="quiz-q" class="quiz-q"></p>
+          <div id="quiz-answers"></div>
+          <p id="quiz-feedback" class="feedback"></p>
+        </div>
+      </div>
+
+      <!-- Pausa / bitácora -->
+      <div id="pause" class="overlay hidden">
+        <div class="panel modal">
+          <h3>📖 BITÁCORA DE COLÓN</h3>
+          <div id="pause-facts" class="facts-list"></div>
+          <button id="btn-resume" class="btn">Seguir navegando</button>
+        </div>
+      </div>
+
+      <!-- Game Over -->
+      <div id="over" class="overlay hidden">
+        <div class="panel modal">
+          <h3>💥 ¡NAUFRAGIO!</h3>
+          <p class="fact-text">Colón se quedó sin fuerzas… ¡pero los grandes navegantes nunca se rinden!</p>
+          <button id="btn-retry" class="btn big">↻ Reintentar nivel</button>
+        </div>
+      </div>
+
+      <!-- Victoria final -->
+      <div id="win" class="overlay hidden">
+        <div class="panel modal parchment">
+          <h3>🏆 ¡TIERRA A LA VISTA!</h3>
+          <p class="fact-text">El <b>12 de octubre de 1492</b> Colón llegó a América.
+          ¡Has completado el gran viaje!</p>
+          <p class="score-line">Puntuación final: <b id="win-score">0</b></p>
+          <p id="win-record" class="high"></p>
+          <div id="win-facts" class="facts-list"></div>
+          <button id="btn-again" class="btn big">↻ Jugar otra vez</button>
+        </div>
+      </div>
+
+      <!-- Controles táctiles -->
+      <div id="touch">
+        <div class="t-left">
+          <button class="tbtn" id="t-left">◀</button>
+          <button class="tbtn" id="t-right">▶</button>
+        </div>
+        <button class="tbtn jump" id="t-jump">A</button>
+      </div>
+    </div>
+    <p id="hint">Consejo: golpea los bloques <b>?</b> y <b>✦</b> desde abajo · salta sobre los enemigos para derrotarlos · llega a la bandera y supera el reto de historia</p>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
